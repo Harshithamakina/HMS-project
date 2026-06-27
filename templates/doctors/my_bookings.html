@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% block title %}My Bookings{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Patient Bookings</h1>
+  <p>All appointments booked with you</p>
+</div>
+<div class="card">
+  {% if bookings %}
+  <div class="table-container">
+    <table>
+      <thead><tr><th>Patient</th><th>Date</th><th>Time</th><th>Status</th><th>Booked On</th></tr></thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td><strong>{{ booking.patient.user.get_full_name }}</strong></td>
+          <td>
+            {{ booking.slot.date }}
+            {% if booking.slot.date < today %}<span class="badge badge-gray" style="margin-left:6px;">Past</span>{% endif %}
+          </td>
+          <td>{{ booking.slot.start_time }} – {{ booking.slot.end_time }}</td>
+          <td>
+            {% if booking.status == 'CONFIRMED' %}<span class="badge badge-green">✓ Confirmed</span>
+            {% elif booking.status == 'CANCELLED' %}<span class="badge badge-red">Cancelled</span>
+            {% else %}<span class="badge badge-gray">{{ booking.status }}</span>{% endif %}
+          </td>
+          <td style="color:var(--gray-400);">{{ booking.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="icon">📋</div><p>No bookings yet.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

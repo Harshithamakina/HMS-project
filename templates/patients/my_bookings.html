@@ -1,0 +1,52 @@
+{% extends "base/base.html" %}
+{% block title %}My Appointments{% endblock %}
+{% block content %}
+<div class="page-header flex-between">
+  <div><h1>My Appointments</h1><p>All your booked appointments</p></div>
+  <a href="{% url 'patients:browse_doctors' %}" class="btn btn-primary">+ Book New</a>
+</div>
+
+<div class="card">
+  {% if bookings %}
+  <div class="table-container">
+    <table>
+      <thead><tr><th>Doctor</th><th>Specialization</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td><strong>{{ booking.slot.doctor }}</strong></td>
+          <td><span class="badge badge-blue">{{ booking.slot.doctor.specialization }}</span></td>
+          <td>
+            {{ booking.slot.date }}
+            {% if booking.slot.date < today %}<span class="badge badge-gray" style="margin-left:4px;">Past</span>{% endif %}
+          </td>
+          <td>{{ booking.slot.start_time }} – {{ booking.slot.end_time }}</td>
+          <td>
+            {% if booking.status == 'CONFIRMED' %}<span class="badge badge-green">✓ Confirmed</span>
+            {% elif booking.status == 'CANCELLED' %}<span class="badge badge-red">Cancelled</span>
+            {% else %}<span class="badge badge-gray">{{ booking.status }}</span>{% endif %}
+          </td>
+          <td>
+            {% if booking.status == 'CONFIRMED' and booking.slot.date >= today %}
+            <form method="post" action="{% url 'bookings:cancel_booking' booking.id %}" style="display:inline;" onsubmit="return confirm('Cancel this appointment?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);">Cancel</button>
+            </form>
+            {% else %}
+              <span style="color:var(--gray-300);">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="icon">🏥</div>
+    <p>No appointments yet.</p>
+    <a href="{% url 'patients:browse_doctors' %}" class="btn btn-primary mt-4">Book Your First Appointment</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

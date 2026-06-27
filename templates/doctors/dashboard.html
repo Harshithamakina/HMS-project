@@ -1,0 +1,94 @@
+{% extends "base/base.html" %}
+{% block title %}Doctor Dashboard{% endblock %}
+{% block content %}
+<div class="page-header flex-between">
+  <div>
+    <h1>Good day, Dr. {{ doctor.user.get_full_name }} 👋</h1>
+    <p>{{ doctor.specialization }} — Here's your overview for today</p>
+  </div>
+  <a href="{% url 'doctors:manage_slots' %}" class="btn btn-primary">+ Add Availability</a>
+</div>
+
+{% if not google_connected %}
+<div class="google-banner">
+  <span style="font-size:26px;">📅</span>
+  <p><strong>Connect Google Calendar</strong> — Automatically create calendar events when patients book your slots.</p>
+  <a href="{% url 'accounts:google_auth' %}" class="btn btn-outline btn-sm" style="white-space:nowrap;">Connect Now</a>
+</div>
+{% endif %}
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-icon">📋</div>
+    <div class="stat-number">{{ total_slots }}</div>
+    <div class="stat-label">Total Slots</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">✅</div>
+    <div class="stat-number">{{ total_bookings }}</div>
+    <div class="stat-label">Confirmed Bookings</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🕐</div>
+    <div class="stat-number">{{ upcoming_slots.count }}</div>
+    <div class="stat-label">Available Slots</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">📅</div>
+    <div class="stat-number">{{ upcoming_bookings.count }}</div>
+    <div class="stat-label">Upcoming Appointments</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header flex-between">
+      <div><h2>Upcoming Appointments</h2><p>Next confirmed bookings</p></div>
+      <a href="{% url 'doctors:my_bookings' %}" style="font-size:12px;color:var(--primary);font-weight:600;">View all →</a>
+    </div>
+    {% if upcoming_bookings %}
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Patient</th><th>Date</th><th>Time</th></tr></thead>
+        <tbody>
+          {% for booking in upcoming_bookings %}
+          <tr>
+            <td><strong>{{ booking.patient.user.get_full_name }}</strong></td>
+            <td>{{ booking.slot.date }}</td>
+            <td>{{ booking.slot.start_time }} – {{ booking.slot.end_time }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="icon">📋</div><p>No upcoming appointments yet.</p></div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header flex-between">
+      <div><h2>Available Slots</h2><p>Your open appointment slots</p></div>
+      <a href="{% url 'doctors:manage_slots' %}" style="font-size:12px;color:var(--primary);font-weight:600;">Manage →</a>
+    </div>
+    {% if upcoming_slots %}
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for slot in upcoming_slots %}
+          <tr>
+            <td>{{ slot.date }}</td>
+            <td>{{ slot.start_time }} – {{ slot.end_time }}</td>
+            <td><span class="badge badge-green">Available</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="icon">🗓</div><p>No slots yet. <a href="{% url 'doctors:manage_slots' %}" style="color:var(--primary);">Add some →</a></p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

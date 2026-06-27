@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HMS{% endblock %} — Hospital Management System</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon">⚕</div>
+            <span>MediBook</span>
+        </a>
+        <div class="nav-links">
+            {% if user.is_doctor %}
+                <a href="{% url 'doctors:dashboard' %}">Dashboard</a>
+                <a href="{% url 'doctors:manage_slots' %}">My Slots</a>
+                <a href="{% url 'doctors:my_bookings' %}">Bookings</a>
+            {% else %}
+                <a href="{% url 'patients:dashboard' %}">Dashboard</a>
+                <a href="{% url 'patients:browse_doctors' %}">Find Doctors</a>
+                <a href="{% url 'patients:my_bookings' %}">Appointments</a>
+            {% endif %}
+        </div>
+        <div class="nav-user">
+            <span class="role-badge role-{{ user.role|lower }}">{{ user.role }}</span>
+            <div class="nav-avatar">{{ user.first_name.0|upper }}{{ user.last_name.0|upper }}</div>
+            <span style="font-weight:500;color:var(--gray-700);">{{ user.get_full_name|default:user.email }}</span>
+            <a href="{% url 'accounts:logout' %}" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="main-content">
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+                <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:18px;opacity:0.5;">×</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

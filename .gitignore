@@ -1,0 +1,22 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# Node
+node_modules/
+
+# Serverless
+.serverless/
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
